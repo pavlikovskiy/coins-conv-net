@@ -1,4 +1,4 @@
-function [predThis, acc] = testCoinPrediction(datasetDir, imageDir, datasetFileName, cnn, Theta3, maxTestSamples)
+function [pred, acc] = testCoinPrediction(datasetDir, imageDir, datasetFileName, cnn, Theta3, maxTestSamples, maxTopPredictions)
 
 %TESTPREDICTION Implements the test on specific dataset
 %
@@ -11,6 +11,7 @@ function [predThis, acc] = testCoinPrediction(datasetDir, imageDir, datasetFileN
 
 tempDir = 'temp/'; % for prediction export
 batchSize = 20;
+%maxTopPredictions = 3;
 
 %imageDir = strcat(datasetDir, imgDir); 
 datasetFile = strcat(datasetDir, datasetFileName); 
@@ -79,7 +80,6 @@ for batchIter = 1 : batchIterationCount
         save(convPooledFeaturesCacheFile, 'X');
 
     end
-    maxTopPredictions = 3;
     [predThis, confidence] = softmaxPredict(Theta3, X, maxTopPredictions);
     pred = [pred; predThis];
     
@@ -88,7 +88,7 @@ end
 
 
 % -------------- debug info ------------
- a = [sampleId, softmaxY(:), pred, (pred(:, 1) == softmaxY(:))]
+ %a = [sampleId, softmaxY(:), pred, (pred(:, 1) == softmaxY(:))]
  
  
  %confidence'
@@ -96,9 +96,13 @@ end
 % -------------- debug info ------------
 
 
-
+acc = zeros(size(softmaxY));
 % accumulate predictions over maxTopPredictions
-acc = (pred(:, 1) == softmaxY(:));
+for i = 1:maxTopPredictions
+    acc = acc + (pred(:, i) == softmaxY(:));
+end
+
+%acc = (pred(:, 1) == softmaxY(:)) + (pred(:, 2) == softmaxY(:)) + (pred(:, 3) == softmaxY(:));
 
 acc = sum(acc) / size(acc, 1);
 % fprintf('\nAccuracy for countries (not for coins inside): %2.3f%%\n', acc * 100);

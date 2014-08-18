@@ -23,17 +23,6 @@ for convLayerIndex = 1 : amountConvLayers
 end
 
 
-% show matrix size transformation between layers
-for convLayerIndex = 1 : amountConvLayers
-    fprintf('\nL%u -> L%u  (%u X %u X %u) -> (%u X %u X %u) / (%u -> %u) \n', convLayerIndex, convLayerIndex + 1, ...
-                                        cnn{convLayerIndex}.inputWidth, cnn{convLayerIndex}.inputHeight, cnn{convLayerIndex}.inputChannels, cnn{convLayerIndex}.outputWidth, cnn{convLayerIndex}.outputHeight, cnn{convLayerIndex}.outputChannels, ...
-                                        cnn{convLayerIndex}.inputWidth * cnn{convLayerIndex}.inputHeight * cnn{convLayerIndex}.inputChannels, cnn{convLayerIndex}.outputWidth * cnn{convLayerIndex}.outputHeight * cnn{convLayerIndex}.outputChannels);
-end
-                                    
-fprintf('\nLayer FC1 -> Layer FC2  %u -> %u \n', cnn{2}.outputWidth * cnn{2}.outputHeight * cnn{2}.outputChannels, inputSizeFCL2);
-%fprintf('\nL3 -> L4  %u -> %u \n', cnn{1}.outputWidth * cnn{1}.outputHeight * cnn{1}.outputChannels, inputSizeFCL2);
-
-fprintf('\nLayer FC2 -> Out  %u -> %u \n', inputSizeFCL2, numOutputClasses);
 
 
 %% Initializatoin
@@ -63,12 +52,27 @@ mkdir(strcat(datasetDir, tempDir)); % create temp dir - if doesn't exist
 
 csvdata = csvread(strcat(datasetDir, trainSetCSVFile));  
 
-
 % show distribution test samples over output labels
 unique_labels = unique(csvdata(:, 2));
 hist(csvdata(:, 2), max(unique_labels))
 
+numOutputClasses = max(unique_labels);
+
+% show matrix size transformation between layers
+for convLayerIndex = 1 : amountConvLayers
+    fprintf('\nL%u -> L%u  (%u X %u X %u) -> (%u X %u X %u) / (%u -> %u) \n', convLayerIndex, convLayerIndex + 1, ...
+                                        cnn{convLayerIndex}.inputWidth, cnn{convLayerIndex}.inputHeight, cnn{convLayerIndex}.inputChannels, cnn{convLayerIndex}.outputWidth, cnn{convLayerIndex}.outputHeight, cnn{convLayerIndex}.outputChannels, ...
+                                        cnn{convLayerIndex}.inputWidth * cnn{convLayerIndex}.inputHeight * cnn{convLayerIndex}.inputChannels, cnn{convLayerIndex}.outputWidth * cnn{convLayerIndex}.outputHeight * cnn{convLayerIndex}.outputChannels);
+end
+                                    
+fprintf('\nLayer FC1 -> Out  %u -> %u \n', cnn{2}.outputWidth * cnn{2}.outputHeight * cnn{2}.outputChannels, numOutputClasses);
+%fprintf('\nL3 -> L4  %u -> %u \n', cnn{1}.outputWidth * cnn{1}.outputHeight * cnn{1}.outputChannels, inputSizeFCL2);
+
+%fprintf('\nLayer FC2 -> Out  %u -> %u \n', inputSizeFCL2, numOutputClasses);
+
+
 pause;
+
 
 sampleId = csvdata(:, 1); % first column is sampleId (imageIdx)
 y = csvdata(:, 2); % second column is coinIdx
@@ -290,21 +294,22 @@ for trainingIter = 1 : numTrainIterFC % loop over training iterations
 %-------Run test-------------------------
     % run test when trainingIter > startTestIteration
 
-    
+maxTopPredictions = 3;
+
     if plotTrainError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tr.shuffled.restricted.csv', cnn, Theta3, 100); %maxTestSamples = 100
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tr.shuffled.restricted.csv', cnn, Theta3, 100, 1); %maxTestSamples = 100
         fprintf('\n tr: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 1) = 100 - acc * 100;
     end
 
     if plotValidationError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.cv.csv', cnn, Theta3, maxTestSamples);
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.cv.csv', cnn, Theta3, maxTestSamples, maxTopPredictions);
         fprintf('\n cv: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 2) = 100 - acc * 100;
     end
 
     if plotTestError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tst.csv', cnn, Theta3, maxTestSamples);
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tst.csv', cnn, Theta3, maxTestSamples, maxTopPredictions);
         fprintf('\n tst: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 3) = 100 - acc * 100;
     end

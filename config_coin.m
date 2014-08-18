@@ -14,7 +14,7 @@ maxTestSamples = 200; % if test set is large - create subset
 % !! WHEN CHANGE batchSize - CLEAN UP / DELETE TEMP DIRECTORY (tempDir)
 batchSize = 24; % batch size for mini-batch algorithm
 
-numTrainIterFC = 1000; % number of training iterations for full connected layers
+numTrainIterFC = 100; % number of training iterations for full connected layers
 
 numOutputClasses = 280; % 276
 
