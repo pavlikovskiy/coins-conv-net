@@ -1,4 +1,4 @@
-function [prediction] = softmaxPredict(theta, data, maxTopPredictions)
+function [prediction, confidence] = softmaxPredict(theta, data, maxTopPredictions)
 
 % theta - trained theta
 % data - the N x M input matrix, where each column data(:, i) corresponds to
@@ -10,6 +10,8 @@ m = size(data, 2);
 prediction = zeros(m, maxTopPredictions); % M x maxTopPredictions
 
 M = theta * data; % K x M
+
+confidence = max(M, [], 1) ./ sum(M, 1);
 
 
 

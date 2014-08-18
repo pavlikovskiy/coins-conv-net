@@ -1,4 +1,4 @@
-function [predThis, acc] = testCoinPrediction(datasetDir, imageDir, datasetFileName, cnn, Theta3, Theta4, maxTestSamples)
+function [predThis, acc] = testCoinPrediction(datasetDir, imageDir, datasetFileName, cnn, Theta3, maxTestSamples)
 
 %TESTPREDICTION Implements the test on specific dataset
 %
@@ -80,7 +80,7 @@ for batchIter = 1 : batchIterationCount
 
     end
     maxTopPredictions = 3;
-    [predThis, confidence] = mlpPredict(Theta3, Theta4, X, maxTopPredictions);
+    [predThis, confidence] = softmaxPredict(Theta3, X, maxTopPredictions);
     pred = [pred; predThis];
     
 end

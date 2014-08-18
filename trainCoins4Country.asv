@@ -10,7 +10,7 @@
 trainSetCSVFile = 'coin.tr.shuffled.restricted.csv'; % this file will be generated from 'coin.tr.csv'
 
 % configs are in separate file to easy share between train.m / test.m
-config_coin;
+configMaster;
 %numClassesL3 = 6; % amount of output lables, classes (e.g. coins)
 
 max_class_samples = 50;
@@ -203,8 +203,7 @@ if exist(theta3File, 'file')
 else
     % File does not exist. random initialization
     fprintf('Cant load Thetta4 from %s  \n  Do random initialization for Theta1 \n', theta3File);
-%    initial_Theta3 = mlpMatrixLayerInit(mlpInputLayerSize, mlpHiddenLayerSize);
-    initial_Theta3 = 0.005 * randn(numOutputClasses * mlpInputLayerSize, 1);
+    initial_Theta3 = mlpMatrixLayerInit(mlpInputLayerSize, mlpHiddenLayerSize);
 end
 
 
@@ -271,10 +270,12 @@ for trainingIter = 1 : numTrainIterFC % loop over training iterations
     costs(trainingIter) = iterCost;
     
     % save thetas - can be used if training cycle interrupted 
-    Theta3 = reshape(nn_params, numOutputClasses, mlpInputLayerSize);
+    Theta3 = reshape(nn_params(1:(mlpInputLayerSize + 1) * mlpHiddenLayerSize), (mlpInputLayerSize + 1), mlpHiddenLayerSize);
+    Theta4 = reshape(nn_params((1 + (mlpInputLayerSize + 1) * mlpHiddenLayerSize):end), (mlpHiddenLayerSize + 1), numOutputClasses);
     save(theta3File, 'Theta3');
+    save(theta4File, 'Theta4');
     
-    fprintf('\nIteration %4i done - Theta3 saved. Average Cost is %4.4f \n', trainingIter, iterCost);
+    fprintf('\nIteration %4i done - Theta3, Theta4 saved. Average Cost is %4.4f \n', trainingIter, iterCost);
 
 %-------- debug info ------------    
     funcMinChart = figure(2);
@@ -289,26 +290,24 @@ for trainingIter = 1 : numTrainIterFC % loop over training iterations
 
 %-------Run test-------------------------
     % run test when trainingIter > startTestIteration
-
     
     if plotTrainError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tr.shuffled.restricted.csv', cnn, Theta3, 100); %maxTestSamples = 100
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tr.shuffled.restricted.csv', cnn, Theta3, Theta4, 100); %maxTestSamples = 100
         fprintf('\n tr: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 1) = 100 - acc * 100;
     end
 
     if plotValidationError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.cv.csv', cnn, Theta3, maxTestSamples);
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.cv.csv', cnn, Theta3, Theta4, maxTestSamples);
         fprintf('\n cv: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 2) = 100 - acc * 100;
     end
 
     if plotTestError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tst.csv', cnn, Theta3, maxTestSamples);
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tst.csv', cnn, Theta3, Theta4, maxTestSamples);
         fprintf('\n tst: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 3) = 100 - acc * 100;
     end
-
 
     plot(s(2), 1 : numTrainIterFC, predError(:, 1), 1 : numTrainIterFC, predError(:, 2), 1 : numTrainIterFC, predError(:, 3) );
     ylabel(s(2), 'Prediction Error %');
