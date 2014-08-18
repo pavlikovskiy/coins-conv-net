@@ -112,8 +112,8 @@ inputSizeFCL2 = 1000;
 mlpLambda = 1e-3; % weight decay for L3
 
 
-addpath C:/Develop/src/neuro4j/neural-networks/network-prototypes/libs/         % load libs
-addpath C:/Develop/src/neuro4j/neural-networks/network-prototypes/libs/minFunc/
+addpath ./libs/         % load libs
+addpath ./libs/minFunc/
 
 %  Use minFunc to minimize cost functions
 saeOptions.Method = 'lbfgs'; % Use L-BFGS to optimize our cost function.
