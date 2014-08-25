@@ -15,7 +15,7 @@ config_coin;
 
 max_class_samples = 50;
 
-amountConvLayers = 2;
+amountConvLayers = 3;
 
 for convLayerIndex = 1 : amountConvLayers
     fprintf(' Parameters for L%u  \n', convLayerIndex + 1);
@@ -65,7 +65,7 @@ for convLayerIndex = 1 : amountConvLayers
                                         cnn{convLayerIndex}.inputWidth * cnn{convLayerIndex}.inputHeight * cnn{convLayerIndex}.inputChannels, cnn{convLayerIndex}.outputWidth * cnn{convLayerIndex}.outputHeight * cnn{convLayerIndex}.outputChannels);
 end
                                     
-fprintf('\nLayer FC1 -> Out  %u -> %u \n', cnn{2}.outputWidth * cnn{2}.outputHeight * cnn{2}.outputChannels, numOutputClasses);
+fprintf('\nLayer FC1 -> Out  %u -> %u \n', cnn{amountConvLayers}.outputWidth * cnn{amountConvLayers}.outputHeight * cnn{amountConvLayers}.outputChannels, numOutputClasses);
 %fprintf('\nL3 -> L4  %u -> %u \n', cnn{1}.outputWidth * cnn{1}.outputHeight * cnn{1}.outputChannels, inputSizeFCL2);
 
 %fprintf('\nLayer FC2 -> Out  %u -> %u \n', inputSizeFCL2, numOutputClasses);
@@ -169,13 +169,13 @@ cnn{2}.patches = [];
 cnn{2}.meanPatch = [];
 trainConvLayer(cnn, convLayer, datasetDir, tempDir, trainSamplesAmount, batchSize, saeOptions);
 
-%{
 % L4 training (patches extraction, SAE training, convelution & pooling)
 convLayer = convLayer + 1;
 cnn{3}.patches = [];
 cnn{3}.meanPatch = [];
 trainConvLayer(cnn, convLayer, datasetDir, tempDir, trainSamplesAmount, batchSize, saeOptions);
 
+%{
 % L5 training (patches extraction, SAE training, convelution & pooling)
 convLayer = convLayer + 1;
 cnn{4}.patches = [];
@@ -297,23 +297,22 @@ for trainingIter = 1 : numTrainIterFC % loop over training iterations
 maxTopPredictions = 3;
 
     if plotTrainError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tr.shuffled.restricted.csv', cnn, Theta3, 100, 1); %maxTestSamples = 100
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tr.shuffled.restricted.csv', cnn, amountConvLayers, Theta3, 100, 1); %maxTestSamples = 100
         fprintf('\n tr: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 1) = 100 - acc * 100;
     end
 
     if plotValidationError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.cv.csv', cnn, Theta3, maxTestSamples, maxTopPredictions);
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.cv.csv', cnn, amountConvLayers, Theta3, maxTestSamples, maxTopPredictions);
         fprintf('\n cv: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 2) = 100 - acc * 100;
     end
 
     if plotTestError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tst.csv', cnn, Theta3, maxTestSamples, maxTopPredictions);
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tst.csv', cnn, amountConvLayers, Theta3, maxTestSamples, maxTopPredictions);
         fprintf('\n tst: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 3) = 100 - acc * 100;
     end
-
 
     plot(s(2), 1 : numTrainIterFC, predError(:, 1), 1 : numTrainIterFC, predError(:, 2), 1 : numTrainIterFC, predError(:, 3) );
     ylabel(s(2), 'Prediction Error %');

@@ -1,4 +1,4 @@
-function [pred, acc] = testCoinPrediction(datasetDir, imageDir, datasetFileName, cnn, Theta3, maxTestSamples, maxTopPredictions)
+function [pred, acc] = testCoinPrediction(datasetDir, imageDir, datasetFileName, cnn, amountConvLayers, Theta3, maxTestSamples, maxTopPredictions)
 
 %TESTPREDICTION Implements the test on specific dataset
 %
@@ -69,7 +69,7 @@ for batchIter = 1 : batchIterationCount
     else
         fprintf('\n  Cache not found Creating %s \n', convPooledFeaturesCacheFile);
         [X] = loadImageSet(sampleId(startPosition:endPosition), imageDir, cnn{1}.inputWidth, cnn{1}.inputHeight); % images
-        for convLayerIndex = 1 : 2
+        for convLayerIndex = 1 : amountConvLayers
             fprintf('\n   L%u  (%u X %u X %u) -> (%u X %u X %u) \n', convLayerIndex + 1, cnn{convLayerIndex}.inputWidth, cnn{convLayerIndex}.inputHeight, cnn{convLayerIndex}.inputChannels, cnn{convLayerIndex}.outputWidth, cnn{convLayerIndex}.outputHeight, cnn{convLayerIndex}.outputChannels);
             cpFeatures = convolveAndPool(X, cnn{convLayerIndex}.theta, cnn{convLayerIndex}.features, ...
                             cnn{convLayerIndex}.inputHeight, cnn{convLayerIndex}.inputWidth, cnn{convLayerIndex}.inputChannels, ...
@@ -83,7 +83,20 @@ for batchIter = 1 : batchIterationCount
     [predThis, confidence] = softmaxPredict(Theta3, X, maxTopPredictions);
     pred = [pred; predThis];
     
+    for idx = startPosition:endPosition
+        prIdx = idx - startPosition + 1;
+        match = 0; 
+        %predThis(prIdx, 1) == softmaxY(idx) % | predThis(prIdx, 2) == softmaxY(idx) | predThis(prIdx, 3) == softmaxY(idx)
+        predStr = ' ';
+        for i = 1:maxTopPredictions
+            match = match | predThis(prIdx, i) == softmaxY(idx);
+            predStr = strcat(predStr, num2str(predThis(prIdx, i)), '-');
+        end
+        fprintf('%12.0f -> (%u) %s %u \n', sampleId(idx), softmaxY(idx), predStr, match);
+    end
+
 end
+
 
 
 
