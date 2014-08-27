@@ -13,10 +13,6 @@ trainSetCSVFile = 'coin.tr.shuffled.restricted.csv'; % this file will be generat
 config_coin;
 %numClassesL3 = 6; % amount of output lables, classes (e.g. coins)
 
-max_class_samples = 50;
-
-amountConvLayers = 3;
-
 for convLayerIndex = 1 : amountConvLayers
     fprintf(' Parameters for L%u  \n', convLayerIndex + 1);
     cnn{convLayerIndex}
@@ -86,7 +82,7 @@ batchIterationCount = ceil(trainSamplesAmount / batchSize);
 
 visualAmount = 3^2;
 fprintf('Visualize %u full size images ...\n', visualAmount);
-[previewX] = loadImageSet(csvdata(1:visualAmount, 1), strcat(datasetDirRoot, imgDir), imgW, imgH);
+[previewX] = loadImageSet(csvdata(1:visualAmount, 1), strcat(datasetDir, imgDir), imgW, imgH);
 fullSizeImages = zeros(imgW^2, visualAmount);
 for i = 1:visualAmount
     % visualization works for squared matrixes
@@ -118,7 +114,7 @@ else
     fprintf('Cant load patches for sparse auto-encoder training from %s  \n', saeL2PatchesFile);
     fprintf('  Do patch geenration \n');
     
-    unlabeledImgDirFullPath = strcat(datasetDirRoot, unlabeledImgDir); % dir with unlabeled images
+    unlabeledImgDirFullPath = strcat(datasetDir, unlabeledImgDir); % dir with unlabeled images
     
     maxFiles4Patches = 10000; % if unlabeled files too many -> get randomly some of them
     if maxFiles4Patches > size(csvdata, 1)
@@ -156,12 +152,14 @@ convLayer = 2;
 cnn{1}.patches = patches;
 cnn{1}.meanPatch = meanPatch;
 
-saeOptTheta = trainConvLayer(cnn, convLayer, datasetDir, tempDir, trainSamplesAmount, batchSize, saeOptions, sampleId, strcat(datasetDirRoot, imgDir), imgW, imgH);
+saeOptTheta = trainConvLayer(cnn, convLayer, datasetDir, tempDir, trainSamplesAmount, batchSize, saeOptions, sampleId, strcat(datasetDir, imgDir), imgW, imgH);
 
 % Visualization Sparser Autoencoder Features for L2 to see that the features look good
 W = reshape(saeOptTheta(1:cnn{1}.inputVisibleSize * cnn{1}.features), cnn{1}.features, cnn{1}.inputVisibleSize);
 display_network(W'); % L2
 
+
+%{
 
 % L3 training (patches extraction, SAE training, convelution & pooling)
 convLayer = convLayer + 1;
@@ -175,7 +173,6 @@ cnn{3}.patches = [];
 cnn{3}.meanPatch = [];
 trainConvLayer(cnn, convLayer, datasetDir, tempDir, trainSamplesAmount, batchSize, saeOptions);
 
-%{
 % L5 training (patches extraction, SAE training, convelution & pooling)
 convLayer = convLayer + 1;
 cnn{4}.patches = [];
@@ -297,19 +294,19 @@ for trainingIter = 1 : numTrainIterFC % loop over training iterations
 maxTopPredictions = 3;
 
     if plotTrainError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tr.shuffled.restricted.csv', cnn, amountConvLayers, Theta3, 100, 1); %maxTestSamples = 100
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDir, imgDir), 'coin.tr.shuffled.restricted.csv', cnn, amountConvLayers, Theta3, 100, 1); %maxTestSamples = 100
         fprintf('\n tr: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 1) = 100 - acc * 100;
     end
 
     if plotValidationError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.cv.csv', cnn, amountConvLayers, Theta3, maxTestSamples, maxTopPredictions);
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDir, imgDir), 'coin.cv.csv', cnn, amountConvLayers, Theta3, maxTestSamples, maxTopPredictions);
         fprintf('\n cv: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 2) = 100 - acc * 100;
     end
 
     if plotTestError == 1 && trainingIter > startTestIteration
-        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDirRoot, imgDir), 'coin.tst.csv', cnn, amountConvLayers, Theta3, maxTestSamples, maxTopPredictions);
+        [prediction, acc] = testCoinPrediction(datasetDir, strcat(datasetDir, imgDir), 'coin.tst.csv', cnn, amountConvLayers, Theta3, maxTestSamples, maxTopPredictions);
         fprintf('\n tst: Prediction error for coins : %2.3f%%\n', 100 - acc * 100);
         predError(trainingIter, 3) = 100 - acc * 100;
     end

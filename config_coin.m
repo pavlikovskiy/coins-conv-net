@@ -7,7 +7,9 @@ plotTestError = 1;
 
 startTestIteration = 0; % iteration where start running prediction test 
 
-max_class_samples = 1000; % max sample amount per output class (used for huge classes e.g. Roman Empire)
+amountConvLayers = 1;
+
+max_class_samples = 500; % max sample amount per output class (used for huge classes e.g. Roman Empire)
 
 maxTestSamples = 200; % if test set is large - create subset 
 
@@ -29,8 +31,8 @@ cnn{1}.inputWidth = imgW;
 cnn{1}.inputHeight = imgH;
 cnn{1}.inputChannels = 1;
 cnn{1}.features = 100;
-cnn{1}.patchSize = 4;
-cnn{1}.poolSize = 4;
+cnn{1}.patchSize = 6;
+cnn{1}.poolSize = 6;
 cnn{1}.numPatches = 100000;
 cnn{1}.inputVisibleSize = cnn{1}.patchSize * cnn{1}.patchSize * cnn{1}.inputChannels;
 cnn{1}.convolutionsStepSize = 10;
@@ -43,6 +45,7 @@ cnn{1}.outputHeight = floor((cnn{1}.inputHeight - cnn{1}.patchSize + 1) / cnn{1}
 cnn{1}.outputChannels = cnn{1}.features;
 cnn{1}.outputSize = cnn{1}.outputWidth * cnn{1}.outputHeight * cnn{1}.outputChannels;
 
+%{
 
 % L3
 cnn{2}.inputWidth = cnn{1}.outputWidth;
@@ -84,8 +87,7 @@ cnn{3}.outputHeight = floor((cnn{3}.inputHeight - cnn{3}.patchSize + 1) / cnn{3}
 cnn{3}.outputChannels = cnn{3}.features;
 cnn{3}.outputSize = cnn{3}.outputWidth * cnn{3}.outputHeight * cnn{3}.outputChannels;
 
-%{
-L5
+%L5
 cnn{4}.inputWidth = cnn{3}.outputWidth;
 cnn{4}.inputHeight = cnn{3}.outputHeight;
 cnn{4}.inputChannels = cnn{3}.outputChannels;
@@ -106,7 +108,7 @@ cnn{4}.outputSize = cnn{4}.outputWidth * cnn{4}.outputHeight * cnn{4}.outputChan
 %}
 
 % L FC 1 (first full connected layer)
-inputSizeFCL1 = cnn{3}.outputSize; 
+inputSizeFCL1 = cnn{1}.outputSize; 
 
 % L FC 2 (second full connected layer)
 inputSizeFCL2 = 1000;
