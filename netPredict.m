@@ -15,7 +15,7 @@ numTestImages = size(X, 2); % amount of training examples
 
 % convLayerIndex = 1;
 
-for convLayerIndex = 1 : 2
+for convLayerIndex = 1 : size(cnn, 2)
     fprintf('\nL%u  (%u X %u X %u) -> (%u X %u X %u) \n', convLayerIndex + 1, cnn{convLayerIndex}.inputWidth, cnn{convLayerIndex}.inputHeight, cnn{convLayerIndex}.inputChannels, cnn{convLayerIndex}.outputWidth, cnn{convLayerIndex}.outputHeight, cnn{convLayerIndex}.outputChannels);
     cpFeatures = convolveAndPool(X, cnn{convLayerIndex}.theta, cnn{convLayerIndex}.features, ...
                     cnn{convLayerIndex}.inputHeight, cnn{convLayerIndex}.inputWidth, cnn{convLayerIndex}.inputChannels, ...
