@@ -202,7 +202,7 @@ if exist(theta3File, 'file')
     initial_Theta3 = Theta3;  
 else
     % File does not exist. random initialization
-    fprintf('Cant load Thetta4 from %s  \n  Do random initialization for Theta1 \n', theta3File);
+    fprintf('Cant load Thetta3 from %s  \n  Do random initialization for Theta1 \n', theta3File);
     initial_Theta3 = mlpMatrixLayerInit(mlpInputLayerSize, mlpHiddenLayerSize);
 end
 

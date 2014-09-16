@@ -62,12 +62,10 @@ for convLayerIndex = 1 : amountConvLayers
 end
                                     
 fprintf('\nLayer FC1 -> Out  %u -> %u \n', cnn{amountConvLayers}.outputWidth * cnn{amountConvLayers}.outputHeight * cnn{amountConvLayers}.outputChannels, numOutputClasses);
-%fprintf('\nL3 -> L4  %u -> %u \n', cnn{1}.outputWidth * cnn{1}.outputHeight * cnn{1}.outputChannels, inputSizeFCL2);
-
 %fprintf('\nLayer FC2 -> Out  %u -> %u \n', inputSizeFCL2, numOutputClasses);
 
 
-pause;
+%pause;
 
 
 sampleId = csvdata(:, 1); % first column is sampleId (imageIdx)
@@ -95,7 +93,7 @@ display_network(fullSizeImages);
 clear previewX fullSizeImages;
 
 fprintf(' Program is paused. Press ENTER to continue  \n');
-pause;
+%pause;
 
 %%======================================================================
 

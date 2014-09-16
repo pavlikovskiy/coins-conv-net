@@ -18,7 +18,7 @@ countriesDir = dir(fullfile(countriesDirStr)); % img files
 %% test with Mexico
     %countriesDir(idx).name
 %    mexicoDir = 'dsJ_AAEBV2EAAAEjlOpucewv';
-    datasetDir = strcat(datasetDirRoot, 'countries/', 'dsJ_AAEBV2EAAAEjlOpucewv', '/');
+    datasetDir = strcat(datasetDirRoot, 'countries/', 'Z5N_AAEBUIsAAAEjidducewv', '/');
 
     csvdata = csvread(strcat(datasetDir, 'coin.tr.csv'));    
     y = csvdata(:, 2); % second column is coinIdx

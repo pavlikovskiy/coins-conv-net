@@ -2,8 +2,10 @@
 
 % plot errors (1- plot, 0 - hide)
 plotTrainError = 1;
-plotValidationError = 1;
-plotTestError = 1;
+plotValidationError = 0;
+plotTestError = 0;
+
+maxTopPredictions = 3;
 
 startTestIteration = 0; % iteration where start running prediction test 
 
@@ -17,7 +19,7 @@ maxTestSamples = 200; % if test set is large - create subset
 %batchSize = 24; % batch size for mini-batch algorithm
 batchSize = 120; % batch size for mini-batch algorithm
 
-numTrainIterFC = 100; % number of training iterations for full connected layers
+numTrainIterFC = 20; % number of training iterations for full connected layers
 
 % numOutputClasses = 280; % set exactly for each country
 
