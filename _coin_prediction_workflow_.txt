@@ -1,0 +1,19 @@
+COIN PREDICTION WORKFLOW
+
+
+get fresh DB dump from PRO (import it locally)
+
+export training data (images, csv) for country(s) 	[java chn-nn-proxy]
+train coin prediction inside country(s)           	[matlab coins-conv-net]
+
+get instances for prediction                     	[java chn-nn-proxy]
+
+run prediction - get generated SQL script			[matlab coins-conv-net]
+
+import prediction - run SQL in PRO DB
+
+approve/decline predictions 
+work through declined predictions
+
+-----------------------------
+new cycle - get fresh DB dump
